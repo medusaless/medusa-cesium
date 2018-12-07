@@ -6,7 +6,6 @@ import COLLECTIONNAME from '../constants/entitycollectionname';
 
 import Cesium from 'cesium/Cesium';
 
-
 /***
  * options:{
  *    position:{

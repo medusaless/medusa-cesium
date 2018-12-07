@@ -30,12 +30,21 @@ function filterFields(attributes, fields) {
 }
 
 function webserviceTranslate(attributes, config) {
+  attributes = { state: 1 };
   return $.ajax({
-    url: config.url
+    url: config.url,
+    contentType:'application/json;charset=utf-8',
+    data: JSON.stringify($.extend(true, {}, config.options, { jObjects: JSON.stringify([attributes]) })),
+    dataType: 'json',
+    type: 'POST'
   }).then(function (res) {
-    return res;
-  }).catch(function () {
-    return 'error';
+    var obj = res || {};
+    if (typeof res === 'array' && res.length) {
+      obj = res[0];
+    }
+    return obj;
+  }).catch(function (res) {
+    return {};
   });
 }
 
@@ -96,6 +105,8 @@ var InfoWindowContentCreator = {
     } else if (simpleTranslateConfig) {
       _attributes = await simpleTranslate(_attributes, simpleTranslateConfig);
     }
+
+    debugger;
 
     return getContentFromObject(itemTemplate, _attributes, fields);
   }

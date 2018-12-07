@@ -35,6 +35,7 @@ import DrawTool from './tools/drawtool';
 
 import comLib from './utils/comLib';
 import InfoWindow from './tools/identitytool/infowindow';
+
 // import viewerCesiumNavigationMixin from './widgets/viewerCesiumNavigationMixin.min.js'
 
 export default class SkywayCesium {
@@ -81,7 +82,6 @@ export default class SkywayCesium {
         this.identityConfigs = this.options.identityConfigs;
         this.identityHelper = new IdentityHelper(this, this.identityConfigs);
         this.infoWindow = new InfoWindow('#' + this.domId);
-
         // 顺序必须如此
         this.defaultIconUrl = this.options.defaultIconUrl || 'entityicon/fire.png';
         this.setInitialExtent();
@@ -282,5 +282,13 @@ export default class SkywayCesium {
 
     removeLayer(layerConfigName) {
         this.layerConfigs
+    }
+
+    getLayerConfigById(id){
+        return this.layerConfigs.find(obj => obj.id === id);
+    }
+
+    getIdentityConfigById(id){
+        return this.identityConfigs.find(obj => obj.id === id);
     }
 }

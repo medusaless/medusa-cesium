@@ -6,6 +6,8 @@ import './css/main.css';
 
 import Cesium from 'cesium/Cesium';
 
+import LAYERTYPE from '../source/constants/layertype';
+
 import $ from 'jquery';
 window.$ = $;
 
@@ -16,9 +18,8 @@ var options = {
             name: "动物多样性",
             url: "http://101.200.232.210:6080/arcgis/rest/services/WEBGISSERVICE/WEBGISXUNHU/FeatureServer/18",
             layers: "",
-            fields: "JINGDU,WEIDU,DONGWU_LX,DONGWU_DM,GUANLIZHAN,MIAOSHU",
             iconUrl: 'entityicon/fire.png',
-            displayType: "ARCGISFEATURE",
+            displayType: LAYERTYPE.ARCGISQUERYLAYER,
             clampToGround: true,
             addToLayerWidget: true,
             show: true
@@ -26,8 +27,7 @@ var options = {
             id: 'googleLyr',
             name: "google地图",
             url: "http://www.google.cn/maps/vt?lyrs=s@748&gl=en&x={x}&y={y}&z={z}",
-            layers: '',
-            displayType: "URLTEMPLATELAYER",
+            displayType: LAYERTYPE.URLTEMPLATELAYER,
             addToLayerWidget: true,
             show: true
         }, {
@@ -36,7 +36,7 @@ var options = {
             url: "http://39.105.11.71:8081/geoserver/text/wms",
             layers: "text:T_GIS_GONGYILIN_PY",
             iconUrl: "",
-            displayType: "WMSLAYER",
+            displayType: LAYERTYPE.WMSLAYER,
             addToLayerWidget: true,
             show: false,
             layerOptions: {
@@ -48,6 +48,7 @@ var options = {
         }, {
             id: 'labelLyr',
             name: "google标注",
+            displayType: LAYERTYPE.RESOURCELAYER,
             resourceName: 'GoogleMapLabel',
             show: true,
             addToLayerWidget: true,
@@ -56,7 +57,7 @@ var options = {
             name: "一行地图",
             url: "http://119.3.56.4:8081/earth/evts?format=image/jpg&scene=default&ds=1&type=edom&x={x}&y={y}&l={z}",
             layers: "",
-            displayType: "URLTEMPLATELAYER",
+            displayType: LAYERTYPE.URLTEMPLATELAYER,
             addToLayerWidget: true,
             show: true
         }],
@@ -74,8 +75,10 @@ var options = {
                     }
                 },
                 // webserviceTranslate: {
-                //     url: "http://101.200.232.210:6080/arcgis/rest/services/WEBGISSERVICE/WEBGISYEWU/MapServer/1/query?where=OBJECTID%3D9609&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson",
-                //     param: {
+                //     url: "http://59.110.26.156:8867/api/Translate/Translate",
+                //     options: {
+                //         "isTranslateFieldName": true,
+                //         "tableName": "YZL_ZLXM"
                 //     }
                 // }
             }

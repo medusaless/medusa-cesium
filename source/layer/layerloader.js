@@ -1,98 +1,70 @@
 import LayerResources from '../layer/resources';
-
-import InfoWindowItemTemplate from '../template/infowindowitem.html'
-import InfoWindowContentCreator from '../tools/identitytool/infowindowcontentcreator';
+import LAYERTYPE from '../constants/layertype';
+import comLib from '../utils/comLib';
 import Cesium from 'cesium/Cesium';
-
-function getLevel(height) {
-    if (height > 48000000) {
-        return 0;
-    } else if (height > 24000000) {
-        return 1;
-    } else if (height > 12000000) {
-        return 2;
-    } else if (height > 6000000) {
-        return 3;
-    } else if (height > 3000000) {
-        return 4;
-    } else if (height > 1500000) {
-        return 5;
-    } else if (height > 750000) {
-        return 6;
-    } else if (height > 375000) {
-        return 7;
-    } else if (height > 187500) {
-        return 8;
-    } else if (height > 93750) {
-        return 9;
-    } else if (height > 46875) {
-        return 10;
-    } else if (height > 23437.5) {
-        return 11;
-    } else if (height > 11718.75) {
-        return 12;
-    } else if (height > 5859.38) {
-        return 13;
-    } else if (height > 2929.69) {
-        return 14;
-    } else if (height > 1464.84) {
-        return 15;
-    } else if (height > 732.42) {
-        return 16;
-    } else if (height > 366.21) {
-        return 17;
-    } else {
-        return 18;
-    }
-}
 
 export default class LayerLoader {
     constructor(app, layerConfigs) {
         this.layerConfigs = layerConfigs;
         this.entityManager = app.entityManager;
         this.viewer = app.viewer;
-        this.skywayCesium = app;
+        this.app = app;
     }
 
     init() {
         this.layerConfigs.forEach(layerConfig => {
-            this.createLayer(layerConfig);
+            this.addLayer(layerConfig);
         });
     }
 
-    createLayer(layerConfig) {
+    removeLayer(id){
+        var layer = this.getImageryLayerById(id);
+        var layerConfig = this.app.getLayerConfigById(id);
+
+        layer && this.app.viewer.imageryLayers.remove(layer);
+        layerConfig && comLib.removeArray(this.app.layerConfigs, layerConfig);
+    }
+
+    addLayer(layerConfig) {
         var { displayType, layers, url, id, show, layerOptions, resourceName } = layerConfig;
-        var resourceLayer = LayerResources[resourceName];
-        if (resourceLayer) {
-            var layer = this.viewer.imageryLayers.addImageryProvider(resourceLayer);
-            layer._layerId = id;
-            return;
+
+        if (this.validateLayerId(id) === false) {
+            throw new Error('duplicate layer id or undefined when called addLayer');
         }
 
-        if (displayType === 'ARCGISFEATURE') {
-            this.changeFeatureQueryUrl(layerConfig);
+        if (displayType === LAYERTYPE.RESOURCELAYER) {
+            this.addResourceLayer(layerConfig);
+        } else if (displayType === LAYERTYPE.ARCGISQUERYLAYER) {
             this.addEntityLayer(layerConfig);
-        } else if (displayType === "ARCGISLAYER") {
+        } else if (displayType === LAYERTYPE.ARCGISLAYER) {
             this.addArgcisLayer(id, url, layers, show, layerOptions);
-        } else if (displayType === 'URLTEMPLATELAYER') {
+        } else if (displayType === LAYERTYPE.URLTEMPLATELAYER) {
             this.addUrlTemplateLayer(id, url, show, layerOptions);
-        } else if (displayType === 'WMSLAYER') {
+        } else if (displayType === LAYERTYPE.WMSLAYER) {
             this.addWMSLayer(id, url, layers, show, layerOptions);
         }
     }
 
+    addResourceLayer(layerConfig) {
+        var resourceLayer = LayerResources[layerConfig.resourceName];
+        if (resourceLayer) {
+            var layer = this.viewer.imageryLayers.addImageryProvider(resourceLayer);
+            layer._layerId = layerConfig.id;
+        }
+    }
+
     addEntityLayer(layerConfig) {
-        var { id, url, displayType, show } = layerConfig
+        var { id, url, displayType, show, url } = layerConfig
         var self = this;
         this.entityManager.addCollection(id);
         if (!show) {
             this.entityManager.hideCollection(id);
         }
+
         $.ajax({
-            url: url,
+            url: this.reduceQueryFields(id, url),
             dataType: 'json'
         }).done(function (queryResult) {
-            debugger;
             if (displayType === 'ARCGISFEATURE') {
                 self.fillArcgisEntityCollection(
                     id,
@@ -140,7 +112,7 @@ export default class LayerLoader {
 
         var cartographicPoints = cartographicFeatures.map(cartographicFeatures => cartographicFeatures.geometry);
         if (clampToGround) {
-            this.skywayCesium
+            this.app
                 .getClampPoints(cartographicPoints)
                 .then(updatedCartographics => {
                     for (var i = 0; i < updatedCartographics.length; i++) {
@@ -217,7 +189,6 @@ export default class LayerLoader {
     }
 
     addWMSLayer(id, url, layers, show, options) {
-        var self = this;
         var layerOption = $.extend({
             url,
             layers
@@ -234,9 +205,19 @@ export default class LayerLoader {
      * 根据配置信息的fields字段，指定arcgis server返回哪些字段
      * @param {*} layerConfig 
      */
-    changeFeatureQueryUrl(layerConfig) {
-        if (layerConfig.displayType === 'ARCGISFEATURE') {
-            layerConfig.url = `${layerConfig.url}/query?where=1%3D1&outFields=${layerConfig.fields}&f=json`;
+
+    validateLayerId(id) {
+        return id && !Object.keys(this.layerConfigs).includes(id);
+    }
+
+    reduceQueryFields(layerId, url) {
+        var identityConfigs = this.app.identityConfigs;
+        
+        if (identityConfigs) {
+            var config = identityConfigs.find(cfg => cfg.id == layerId) || {};
+            return `${url}/query?where=1%3D1&outFields=${config.fields || ''}&f=json`;
+        } else {
+            return `${url}/query?where=1%3D1&outFields=&f=json`;
         }
     }
 }

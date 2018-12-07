@@ -3,8 +3,7 @@
  */
 import Cesium from 'cesium/Cesium'
 import InfoWindow from './infowindow';
-import InfoWindowContentCreator from './infowindowcontentcreator';
-import InfoWindowItemTemplate from '../../template/infowindowitem.html';
+import LAYERTYPE from '../../constants/layertype';
 
 function getLevel(height) {
     if (height > 48000000) {
@@ -116,7 +115,7 @@ export default class IdentityHelper {
         var position;  // Cartesian3
         var layerId;
         var attributes;
-       
+
 
         if (pickedEntity.id && typeof pickedEntity.id !== 'Array') {
             position = pickedEntity.id.position._value;
@@ -165,7 +164,7 @@ export default class IdentityHelper {
                 // Layer name from ImageryFeatureInfo  layerName:id
                 var layerId = self.getIdentityIdFromLayerConfig(featureInfo[0].data.id.split('.')[0]);
 
-                if (self.shouldIdentity('WMS', layerId) && attributes) {
+                if (layerId && self.shouldIdentity('WMS', layerId) && attributes) {
                     self.onIdentityHandler(layerId, { position: cartesian3, attributes });
                 }
             });
@@ -174,7 +173,7 @@ export default class IdentityHelper {
     getIdentityIdFromLayerConfig(fakeId) {
         var _id = '';
         var layerConfig = this.app.layerConfigs.find(
-            cfg => cfg.layers.indexOf(fakeId) !== -1
+            cfg =>  cfg.layers && cfg.layers.indexOf(fakeId) !== -1
         );
 
         if (layerConfig) {
