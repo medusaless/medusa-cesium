@@ -1,0 +1,222 @@
+::-webkit-scrollbar {
+    width: 7px;
+    /*对垂直流动条有效*/
+    height: 7px;
+    /*对水平流动条有效*/
+}
+
+/*定义滚动条的轨道颜色、内阴影及圆角*/
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(100, 100, 100, .7);
+    background-color: rgba(100, 100, 100, .7);
+}
+
+/*定义滑块颜色、内阴影及圆角*/
+
+::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 6px rgba(55, 55, 55, .9);
+    background-color: rgba(11, 11, 11, .9);
+}
+
+/*定义两端按钮的样式*/
+
+::-webkit-scrollbar-button {
+   display:none;
+}
+
+/*定义右下角汇合处的样式*/
+
+::-webkit-scrollbar-corner {
+   display:none;
+}
+
+.fakebutton {
+    background: #5e695e;
+    color: white;
+    border: 1px solid #1b1f1c;
+    outline: none;
+    &:hover {
+        cursor: pointer;
+        opacity: 0.9;
+    }
+    &:active {
+        opacity: 0.7;
+    }
+}
+
+.cesium-widget-credits {
+    display: none !important;
+}
+
+.skywaycesium-toolbar-container {
+    position: absolute;
+    z-index: 999;
+    right: 20px;
+    top: 20px;
+    .skywaycesium-toolbar-item {
+        &:hover {
+            cursor: pointer;
+            background: #5f5e5e;
+            opacity: 0.9;
+        }
+        &:active {
+            background: #484848;
+            opacity: 0.7
+        }
+        margin-left: -1px;
+        padding:10px;
+        background: rgba(53, 53, 53, 0.7);
+        border: 1px solid #504f4f;
+        color: white;
+        float: left;
+        font-size: 12px;
+        letter-spacing:1px;
+        .default-toolbar-item {
+            height: 14px;
+        }
+    }
+}
+
+/****************widget common style*******************/
+
+.skywaycesium-widget {
+    position: absolute;
+    background: rgba(53, 53, 53, 0.7);
+    border: 1px solid #504f4f;
+    z-index: 999;
+    .skywaycesium-widget-title {
+        color: white;
+        padding: 10px;
+        font-size: 16px;
+        background: rgba(42, 47, 43, 0.7);
+        border-bottom: 1px solid #504f4f;
+    }
+    .skywaycesium-widget-close {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: #b9b9b9;
+    }
+    .skywaycesium-widget-content {
+        padding: 5px 10px 10px 10px;
+    }
+}
+
+/*************layerwidget******************/
+
+.layerwidget {
+    ul {
+        padding: 10;
+        margin: 0px;
+        list-style: none;
+    }
+    li {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .skywaycesium-layerwidget-item {
+        min-width: 100px;
+        font-size: 12px;
+        line-height: 25px;
+        color: white;
+        letter-spacing: 1px;
+    }
+}
+
+/****************locationwidget*************************/
+
+.locationwidget {
+    .item {
+        padding: 10px;
+        color: white;
+        font-size: 14px;
+        span {
+            margin-right: 10px;
+        }
+        input {
+            width: 80px;
+        }
+    }
+    button {
+        position: relative;
+        left: calc(100% - 60px);
+    }
+}
+
+.skywaycesium-popup {
+    position: absolute;
+    text-align: center;
+    margin-bottom: 20px;
+    width: 260px;
+    &.skywaycesium-popup-hide {
+        display: none;
+    }
+    .skywaycesium-popup-title {
+        height: 25px;
+        width: 100%;
+        background: rgba(31, 31, 31, 0.8);
+    }
+    .skywaycesium-popup-content-wrapper {
+        max-height: 260px;
+        overflow-y: scroll;
+    }
+    .skywaycesium-popup-content {
+        padding: 1px;
+        text-align: left;
+        border-radius: 3px;
+        background: rgba(49, 49, 49, 0.8);
+        font-size: 14px;
+        padding: 12px;
+        color: #fbf8f8;
+    }
+    .skywaycesium-popup-close-button {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        padding: 4px 4px 0 0;
+        border: none;
+        text-align: center;
+        width: 18px;
+        height: 14px;
+        font: 16px/14px Tahoma, Verdana, sans-serif;
+        color: #c3c3c3;
+        text-decoration: none;
+        font-weight: bold;
+        background: transparent;
+    }
+    .skywaycesium-popup-max-button {
+        position: absolute;
+        top: 0;
+        right: 20px;
+        padding: 4px 4px 0 0;
+        border: none;
+        text-align: center;
+        width: 18px;
+        height: 14px;
+        font: 16px/14px Tahoma, Verdana, sans-serif;
+        color: #c3c3c3;
+        text-decoration: none;
+        font-weight: bold;
+        background: transparent;
+    }
+    .skywaycesium-popup-tip {
+        position: absolute;
+        bottom: 0p;
+        left: 50%;
+        transform: translateX(-50%);
+        overflow: hidden;
+        pointer-events: none;
+        margin-top: -1px;
+        border-top: 20px solid rgba(49, 49, 49, 0.8);
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 20px solid transparent;
+    }
+}
+
+.skywaycesium-infowindow-item-default {
+    font-size: 12px;
+    margin-bottom: 3px;
+}
