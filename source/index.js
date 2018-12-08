@@ -23,7 +23,6 @@ import LocationWidget from './widgets/locationwidget';
 import MEASUREMODE from './constants/measuremode.js';
 import ENTITYCOLLECTION from './constants/entitycollectionname';
 
-import LayerLoader from './layer/layerloader.js';
 
 import IdGenerator from './utils/idgenerator.js';
 
@@ -63,7 +62,6 @@ export default class SkywayCesium {
         this.entityManager = undefined;
         this.toolBar = undefined;
         this.toolManager = undefined;
-        this.layerLoader = undefined;
 
         this.locationWidget = undefined;
         this.layerWidget = undefined;
@@ -91,7 +89,6 @@ export default class SkywayCesium {
         this.initToolBar();
 
         this.initLayerManager();
-        this.initLayerLoader();
         this.initLayerWidget();
 
         // this.viewer.extend(viewerCesiumNavigationMixin, {
@@ -112,11 +109,6 @@ export default class SkywayCesium {
         var { west, south, east, north } = this.options.initialExtent;
         if (west && south && east && north) {
             this.zoomToExtent(west, south, east, north);
-            // this.viewer.extend(viewerCesiumNavigationMixin, {
-            //     defaultResetView: Cesium.Rectangle.fromDegrees(
-            //         west, south, east, north
-            //     )
-            // });
         }
     }
 
@@ -144,14 +136,10 @@ export default class SkywayCesium {
         this.toolManager = new ToolManager();
     }
 
-    initLayerLoader() {
-        this.layerConfigs = this.options.layerConfigs;
-        this.layerLoader = new LayerLoader(this, this.layerConfigs);
-        this.layerLoader.init();
-    }
-
     initLayerManager() {
+        this.layerConfigs = this.options.layerConfigs;
         this.layerManager = new LayerManager(this);
+        this.layerManager.init();
     }
 
     initLayerWidget() {
@@ -239,21 +227,21 @@ export default class SkywayCesium {
         * }
         */
     drawPoint(cartographicPoints, datasourceId, options = {}) {
-        SkywayCesiumHelper.drawPoint.apply(this, arguments);
+        return SkywayCesiumHelper.drawPoint.apply(this, arguments);
     }
 
     //Promise
     drawBillboard(cartographicPoints, datasourceId, options = {}) {
-        SkywayCesiumHelper.drawBillboard.apply(this, arguments);
+        return SkywayCesiumHelper.drawBillboard.apply(this, arguments);
     }
 
     getImageryLayerById(id) {
-        return LayerLoader.prototype.getImageryLayerById.call(this, id);
+        return LayerManager.prototype.getImageryLayerById.call(this, id);
     }
 
 
     getImageryLayerByConstructorName(name) {
-        return LayerLoader.prototype.getImageryLayerByConstructorName.call(this, name);
+        return LayerManager.prototype.getImageryLayerByConstructorName.call(this, name);
     }
 
     /**
@@ -276,12 +264,11 @@ export default class SkywayCesium {
     }
 
     addLayer(layerConfig) {
-        this.layerConfigs.push(layerConfig);
-        this.layerManager.createLayer(layerConfig);
+        this.layerManager.addLayer(layerConfig);
     }
 
-    removeLayer(layerConfigName) {
-        this.layerConfigs
+    removeLayer(id) {
+        this.layerManager.removeLayer(id);
     }
 
     getLayerConfigById(id){

@@ -1,7 +1,38 @@
 import Cesium from 'cesium/Cesium';
 import MEASUREMODE from '../constants/measuremode';
 
+var DEFAULT_OPTIONS = {
+    POINT: {
+        color: Cesium.Color.fromRandom({
+            red: 255,
+            alpha: 1
+        }),
+        pixelSize: 11
+    },
+    POLYLINE: {
+        width: 2,
+        material: new Cesium.ColorMaterialProperty(Cesium.Color.fromRandom({
+            red: 255,
+            alpha: 0.7
+        }))
+    },
+    POLYGON: {
+        material: new Cesium.ColorMaterialProperty(Cesium.Color.fromRandom({
+            red: 255,
+            alpha: 0.7
+        }))
+    },
+    BILLBOARD: function (iconUrl) {
+        return {
+            image: require('../assets/' + (iconUrl || this.defaultIconUrl)),
+            scale: 0.6
+        };
+    }
+}
+
 export default {
+    DEFAULT_OPTIONS,
+    
     getClampPoints(cartographicArr, pointHeightLevel) {
         var pointHeightLevel = pointHeightLevel || this.options.terrain.pointHeightLevel;
         if (typeof pointHeightLevel === 'undefined') {
@@ -114,23 +145,15 @@ export default {
         * }
         */
     async drawPoint(cartographicPoints, datasourceId, options = {}) {
-        var _c2points = [];
-        $.extend(true, _c2points, cartographicPoints);
         var { clampToGround, pointHeightLevel } = options;
+        var _options = $.extend(DEFAULT_OPTIONS.POINT, options);
+
+        var _c2points = $.extend(true, [], cartographicPoints);
         if (clampToGround) {
             _c2points = await this.getClampPoints(_c2points, pointHeightLevel);
         }
 
-        var defaultOptions = {
-            color: Cesium.Color.fromRandom({
-                red: 255,
-                alpha: 1
-            }),
-            pixelSize: 11,
-            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
-        };
-        var _options = $.extend(defaultOptions, options);
-
+        var entities = [];
         for (var i = 0; i < _c2points.length; i++) {
             var entity = new Cesium.Entity({
                 position: Cesium.Cartesian3.fromRadians(
@@ -139,24 +162,21 @@ export default {
                     _c2points[i].height),
                 point: _options
             });
-            this.entityManager.addEntity(datasourceId, entity)
-        }
+            entities.push(this.entityManager.addEntity(datasourceId, entity))
+        };
+        return entities;
     },
 
     async drawBillboard(cartographicPoints, datasourceId, options = {}) {
-        var _c2points = [];
-        $.extend(true, _c2points, cartographicPoints);
         var { clampToGround, pointHeightLevel, iconUrl } = options;
+        var _options = $.extend(DEFAULT_OPTIONS.BILLBOARD(iconUrl), options);
+
+        var _c2points = $.extend(true, [], cartographicPoints);
         if (clampToGround) {
             _c2points = await this.getClampPoints(_c2points, pointHeightLevel);
         }
 
-        var defaultOptions = {
-            image: require('../assets/' + (iconUrl || this.defaultIconUrl)),
-            scale: 0.8
-        };
-        var _options = $.extend(defaultOptions, options);
-
+        var entities = [];
         for (var i = 0; i < _c2points.length; i++) {
             var entity = new Cesium.Entity({
                 position: Cesium.Cartesian3.fromRadians(
@@ -165,8 +185,9 @@ export default {
                     _c2points[i].height),
                 billboard: _options
             });
-            this.entityManager.addEntity(datasourceId, entity)
+            entities.push(this.entityManager.addEntity(datasourceId, entity))
         }
+        return entities;
     },
 
     /**
@@ -176,28 +197,20 @@ export default {
      * @param {*} options 
      */
     async drawPolyline(cartographicPoints, datasourceId, options) {
-        var _c2points = [];
-        $.extend(true, _c2points, cartographicPoints);
+        var { clampToGround, pointHeightLevel } = options;
+        var _options = $.extend(DEFAULT_OPTIONS.POLYLINE, options);
+
+        var _c2points = $.extend(true, [], cartographicPoints);
         var _c2points = _c2points.reduce((prev, curr) => {
             return prev.concat(curr);
         });
-
-        var { clampToGround, pointHeightLevel } = options;
         if (clampToGround) {
             _c2points = await this.getClampPoints(_c2points, pointHeightLevel);
         }
 
-        var defaultOptions = {
-            width: 2,
-            material: new Cesium.ColorMaterialProperty(Cesium.Color.fromRandom({
-                red: 255,
-                alpha: 0.7
-            }))
-        };
-
         var startIndex = 0;
         var endIndex = 0;
-        var _options = $.extend(defaultOptions, options);
+        var entities = [];
         for (var i = 0; i < cartographicPoints.length; i++) {
             startIndex += endIndex;
             endIndex = startIndex + cartographicPoints[i].length;
@@ -209,8 +222,9 @@ export default {
             var entity = new Cesium.Entity({
                 polyline: _options
             });
-            this.entityManager.addEntity(datasourceId, entity)
+            entities.push(this.entityManager.addEntity(datasourceId, entity));
         }
+        return entities;
     },
     /**
      * 
@@ -219,27 +233,22 @@ export default {
      * @param {*} options 
      */
     async drawPolygon(cartographicPoints, datasourceId, options) {
-        var _c2points = [];
-        $.extend(true, _c2points, cartographicPoints);
-        var _c2points = _c2points.reduce((prev, curr) => {
-            return prev.concat(curr);
-        });
-
         var { clampToGround, pointHeightLevel } = options;
+        var _options = $.extend(DEFAULT_OPTIONS.POLYGON, options);
+
+        var _c2points = $.extend(true, [], cartographicPoints)
+            .reduce((prev, curr) => {
+                return prev.concat(curr);
+            });
+
+
         if (clampToGround) {
             _c2points = await this.getClampPoints(_c2points, pointHeightLevel);
         }
 
-        var defaultOptions = {
-            material: new Cesium.ColorMaterialProperty(Cesium.Color.fromRandom({
-                red: 255,
-                alpha: 0.7
-            }))
-        }
-
         var startIndex = 0;
         var endIndex = 0;
-        var _options = $.extend(defaultOptions, options);
+        var entities = [];
         for (var i = 0; i < cartographicPoints.length; i++) {
             startIndex += endIndex;
             endIndex = startIndex + cartographicPoints[i].length;
@@ -251,7 +260,8 @@ export default {
             var entity = new Cesium.Entity({
                 polygon: _options
             });
-            this.entityManager.addEntity(datasourceId, entity)
+            entities.push(this.entityManager.addEntity(datasourceId, entity));
         }
+        return entities;
     }
 }

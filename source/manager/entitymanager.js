@@ -38,7 +38,7 @@ export default class EntityManager {
 
         collection = collection || this.addCollection(collectionName);
 
-        collection.dataSource.entities.add(entity);
+        return collection.dataSource.entities.add(entity);
     }
 
     removeAll() {

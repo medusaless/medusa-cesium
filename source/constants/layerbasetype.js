@@ -1,0 +1,4 @@
+export default {
+    IMAGERYLAYER:'IMAGERYLAYER',
+    ENTITYLAYER:'ENTITYLAYER'
+}

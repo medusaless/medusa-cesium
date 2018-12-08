@@ -120,7 +120,7 @@ export default class IdentityHelper {
         if (pickedEntity.id && typeof pickedEntity.id !== 'Array') {
             position = pickedEntity.id.position._value;
             layerId = pickedEntity.id._layerId;
-            attributes = pickedEntity.id._eAttributes;
+            attributes = pickedEntity.id._eAttribute;
         } else {
             return;
         }
